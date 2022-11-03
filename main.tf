@@ -333,6 +333,12 @@ resource "azurerm_private_endpoint" "pep1" {
     private_connection_resource_id = azurerm_sql_server.primary.id
     subresource_names              = ["sqlServer"]
   }
+
+  lifecycle {
+    ignore_changes = [
+      private_dns_zone_group,
+    ]
+  }
 }
 
 resource "azurerm_private_endpoint" "pep2" {
@@ -348,6 +354,12 @@ resource "azurerm_private_endpoint" "pep2" {
     is_manual_connection           = false
     private_connection_resource_id = azurerm_sql_server.secondary.0.id
     subresource_names              = ["sqlServer"]
+  }
+
+  lifecycle {
+    ignore_changes = [
+      private_dns_zone_group,
+    ]
   }
 }
 
