@@ -107,14 +107,15 @@ resource "azurerm_mssql_server_extended_auditing_policy" "primary" {
 }
 
 resource "azurerm_mssql_server" "secondary" {
-  count                        = var.enable_failover_group ? 1 : 0
-  name                         = format("%s-secondary", var.sqlserver_name)
-  resource_group_name          = local.resource_group_name
-  location                     = var.secondary_sql_server_location
-  version                      = "12.0"
-  administrator_login          = var.admin_username == null ? "sqladmin" : var.admin_username
-  administrator_login_password = var.admin_password == null ? random_password.main.result : var.admin_password
-  tags                         = merge({ "Name" = format("%s-secondary", var.sqlserver_name) }, var.tags, )
+  count                         = var.enable_failover_group ? 1 : 0
+  name                          = format("%s-secondary", var.sqlserver_name)
+  resource_group_name           = local.resource_group_name
+  location                      = var.secondary_sql_server_location
+  version                       = "12.0"
+  administrator_login           = var.admin_username == null ? "sqladmin" : var.admin_username
+  administrator_login_password  = var.admin_password == null ? random_password.main.result : var.admin_password
+  tags                          = merge({ "Name" = format("%s-secondary", var.sqlserver_name) }, var.tags, )
+  public_network_access_enabled = var.public_network_access_enabled
 
   dynamic "identity" {
     for_each = var.identity == true ? [1] : [0]
