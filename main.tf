@@ -86,6 +86,7 @@ resource "azurerm_mssql_server" "primary" {
   version                      = "12.0"
   administrator_login          = var.admin_username == null ? "sqladmin" : var.admin_username
   administrator_login_password = var.admin_password == null ? random_password.main.result : var.admin_password
+  public_network_access_enabled = var.public_network_access_enabled
   tags                         = merge({ "Name" = format("%s-primary", var.sqlserver_name) }, var.tags, )
 
   dynamic "identity" {
@@ -114,8 +115,8 @@ resource "azurerm_mssql_server" "secondary" {
   version                       = "12.0"
   administrator_login           = var.admin_username == null ? "sqladmin" : var.admin_username
   administrator_login_password  = var.admin_password == null ? random_password.main.result : var.admin_password
-  tags                          = merge({ "Name" = format("%s-secondary", var.sqlserver_name) }, var.tags, )
   public_network_access_enabled = var.public_network_access_enabled
+  tags                          = merge({ "Name" = format("%s-secondary", var.sqlserver_name) }, var.tags, )
 
   dynamic "identity" {
     for_each = var.identity == true ? [1] : [0]
