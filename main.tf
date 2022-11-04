@@ -80,14 +80,14 @@ resource "random_password" "main" {
 }
 
 resource "azurerm_mssql_server" "primary" {
-  name                         = format("%s-primary", var.sqlserver_name)
-  resource_group_name          = local.resource_group_name
-  location                     = local.location
-  version                      = "12.0"
-  administrator_login          = var.admin_username == null ? "sqladmin" : var.admin_username
-  administrator_login_password = var.admin_password == null ? random_password.main.result : var.admin_password
+  name                          = format("%s-primary", var.sqlserver_name)
+  resource_group_name           = local.resource_group_name
+  location                      = local.location
+  version                       = "12.0"
+  administrator_login           = var.admin_username == null ? "sqladmin" : var.admin_username
+  administrator_login_password  = var.admin_password == null ? random_password.main.result : var.admin_password
   public_network_access_enabled = var.public_network_access_enabled
-  tags                         = merge({ "Name" = format("%s-primary", var.sqlserver_name) }, var.tags, )
+  tags                          = merge({ "Name" = format("%s-primary", var.sqlserver_name) }, var.tags, )
 
   dynamic "identity" {
     for_each = var.identity == true ? [1] : [0]
@@ -141,7 +141,7 @@ resource "azurerm_mssql_server_extended_auditing_policy" "secondary" {
 # SQL Database creation - Default edition:"Standard" and objective:"S1"
 #--------------------------------------------------------------------
 
-resource "azurerm_sql_database" "db" {
+resource "azurerm_mssql_database" "db" {
   for_each = {
     for index, db in local.databases :
     db.name => db
@@ -173,7 +173,7 @@ resource "azurerm_mssql_database_extended_auditing_policy" "primary" {
     db.name => db if var.enable_database_extended_auditing_policy
   }
 
-  database_id                             = azurerm_sql_database.db[each.value.name].id
+  database_id                             = azurerm_mssql_database.db[each.value.name].id
   storage_endpoint                        = azurerm_storage_account.storeacc.0.primary_blob_endpoint
   storage_account_access_key              = azurerm_storage_account.storeacc.0.primary_access_key
   storage_account_access_key_is_secondary = false
@@ -248,7 +248,7 @@ resource "null_resource" "create_sql" {
   }
 
   provisioner "local-exec" {
-    command = "sqlcmd -I -U ${azurerm_mssql_server.primary.administrator_login} -P ${azurerm_mssql_server.primary.administrator_login_password} -S ${azurerm_mssql_server.primary.fully_qualified_domain_name} -d ${azurerm_sql_database.db[each.value.name].name} -i ${each.value.sqldb_init_script_file} -o ${format("%s.log", replace(var.sqldb_init_script_file, "/.sql/", ""))}"
+    command = "sqlcmd -I -U ${azurerm_mssql_server.primary.administrator_login} -P ${azurerm_mssql_server.primary.administrator_login_password} -S ${azurerm_mssql_server.primary.fully_qualified_domain_name} -d ${azurerm_mssql_database.db[each.value.name].name} -i ${each.value.sqldb_init_script_file} -o ${format("%s.log", replace(var.sqldb_init_script_file, "/.sql/", ""))}"
   }
 }
 
@@ -305,7 +305,7 @@ resource "azurerm_sql_failover_group" "fog" {
   name                = "sqldb-failover-group"
   resource_group_name = local.resource_group_name
   server_name         = azurerm_mssql_server.primary.name
-  databases           = [azurerm_sql_database.db[*].id]
+  databases           = [azurerm_mssql_database.db[*].id]
   tags                = merge({ "Name" = format("%s", "sqldb-failover-group") }, var.tags, )
 
   partner_servers {
@@ -435,7 +435,7 @@ resource "azurerm_monitor_diagnostic_setting" "extaudit" {
   }
 
   name                       = lower("extaudit-${var.database_name}-diag")
-  target_resource_id         = azurerm_sql_database.db[each.value.name].id
+  target_resource_id         = azurerm_mssql_database.db[each.value.name].id
   log_analytics_workspace_id = var.log_analytics_workspace_id
   storage_account_id         = var.storage_account_id != null ? var.storage_account_id : null
 
