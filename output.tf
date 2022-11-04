@@ -52,25 +52,25 @@ output "sql_server_admin_password" {
 
 output "sql_database_id" {
   description = "The SQL Database ID; DEPRECATED - use sql_database_ids"
-  value       = azurerm_sql_database.db[local.databases[0].name].id
+  value       = azurerm_mssql_database.db[local.databases[0].name].id
 }
 
 output "sql_database_ids" {
   description = "The SQL Database ID"
   value = [
-    for db in azurerm_sql_database.db : db.id
+    for db in azurerm_mssql_database.db : db.id
   ]
 }
 
 output "sql_database_name" {
   description = "The SQL Database Name; DEPRECATED - use sql_database_names"
-  value       = azurerm_sql_database.db[local.databases[0].name].name
+  value       = azurerm_mssql_database.db[local.databases[0].name].name
 }
 
 output "sql_database_names" {
   description = "The SQL Database Name"
   value = [
-    for db in azurerm_sql_database.db : db.name
+    for db in azurerm_mssql_database.db : db.name
   ]
 }
 
