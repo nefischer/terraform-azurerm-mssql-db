@@ -51,8 +51,7 @@ module "mssql-server" {
   # The valid service objective name for the database include S0, S1, S2, S3, P1, P2, P4, P6, P11 
   sqlserver_name               = "te-sqldbserver01"
   database_name                = "demomssqldb"
-  sql_database_edition         = "Standard"
-  sqldb_service_objective_name = "S1"
+  database_sku_name         = "Basic"
 
   # SQL server extended auditing policy defaults to `true`. 
   # To turn off set enable_sql_server_extended_auditing_policy to `false`  
@@ -149,7 +148,7 @@ By default, no external access to your SQL Database will be allowed until you ex
 
 Microsoft Azure offers different types of business continuity solutions for their SQL database. One of these solutions is Geo-Replication that provides an asynchronous database copy. You can store this copy in the same or different regions. You can setup up to four readable database copies. If we want to automate and make (users will not affect) failover mechanism transparent, we have to create the auto-failover group.
 
-You can put several single databases on the same SQL Database server into the same failover group. If you add a single database to the failover group, it automatically creates a secondary database using the same edition and the compute size on the secondary server.
+You can put several single databases on the same SQL Database server into the same failover group. If you add a single database to the failover group, it automatically creates a secondary database using the same SKU name and the compute size on the secondary server.
 
 For more information, check the [Microsoft Documentation](https://docs.microsoft.com/en-us/azure/azure-sql/database/active-geo-replication-overview)
 
@@ -245,6 +244,8 @@ An effective naming convention assembles resource names by using important resou
 
 ## Requirements
 
+## Requirements
+
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
@@ -269,6 +270,7 @@ No modules.
 | Name | Type |
 |------|------|
 | [azurerm_monitor_diagnostic_setting.extaudit](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
+| [azurerm_mssql_database.db](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database) | resource |
 | [azurerm_mssql_database_extended_auditing_policy.primary](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database_extended_auditing_policy) | resource |
 | [azurerm_mssql_server.primary](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) | resource |
 | [azurerm_mssql_server.secondary](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) | resource |
@@ -287,7 +289,6 @@ No modules.
 | [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
 | [azurerm_sql_active_directory_administrator.aduser1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/sql_active_directory_administrator) | resource |
 | [azurerm_sql_active_directory_administrator.aduser2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/sql_active_directory_administrator) | resource |
-| [azurerm_mssql_database.db](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/sql_database) | resource |
 | [azurerm_sql_failover_group.fog](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/sql_failover_group) | resource |
 | [azurerm_sql_firewall_rule.fw01](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/sql_firewall_rule) | resource |
 | [azurerm_sql_firewall_rule.fw02](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/sql_firewall_rule) | resource |
@@ -313,7 +314,8 @@ No modules.
 | <a name="input_create_private_dns_zone"></a> [create\_private\_dns\_zone](#input\_create\_private\_dns\_zone) | Whether or not to create a private DNS zone if existing\_private\_dns\_zone is set to null, e.g. if there is already a DNS zone creatted in a shared subscription and the DNS record is deployed by policy | `bool` | `true` | no |
 | <a name="input_create_resource_group"></a> [create\_resource\_group](#input\_create\_resource\_group) | Whether to create resource group and use it for all networking resources | `bool` | `true` | no |
 | <a name="input_database_name"></a> [database\_name](#input\_database\_name) | The name of the database; DEPRECATED - use 'databases' | `string` | `""` | no |
-| <a name="input_databases"></a> [databases](#input\_databases) | The list of databases to create | <pre>list(object({<br>    name                   = string<br>    edition                = string<br>    service_objective_name = string<br>    sqldb_init_script_file = string<br>  }))</pre> | `[]` | no |
+| <a name="input_database_sku_name"></a> [database\_sku\_name](#input\_database\_sku\_name) | The SKU name of the database to be created; DEPRECATED - use 'databases' | `string` | `"Basic"` | no |
+| <a name="input_databases"></a> [databases](#input\_databases) | The list of databases to create | <pre>list(object({<br>    name                   = string<br>    sku_name               = string<br>    sqldb_init_script_file = string<br>  }))</pre> | `[]` | no |
 | <a name="input_disabled_alerts"></a> [disabled\_alerts](#input\_disabled\_alerts) | Specifies an array of alerts that are disabled. Allowed values are: Sql\_Injection, Sql\_Injection\_Vulnerability, Access\_Anomaly, Data\_Exfiltration, Unsafe\_Action. | `list(any)` | `[]` | no |
 | <a name="input_email_addresses_for_alerts"></a> [email\_addresses\_for\_alerts](#input\_email\_addresses\_for\_alerts) | A list of email addresses which alerts should be sent to. | `list(any)` | `[]` | no |
 | <a name="input_enable_database_extended_auditing_policy"></a> [enable\_database\_extended\_auditing\_policy](#input\_enable\_database\_extended\_auditing\_policy) | Manages Extended Audit policy for SQL database | `bool` | `false` | no |
@@ -339,9 +341,7 @@ No modules.
 | <a name="input_random_password_length"></a> [random\_password\_length](#input\_random\_password\_length) | The desired length of random password created by this module | `number` | `32` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | A container that holds related resources for an Azure solution | `string` | `""` | no |
 | <a name="input_secondary_sql_server_location"></a> [secondary\_sql\_server\_location](#input\_secondary\_sql\_server\_location) | Specifies the supported Azure location to create secondary sql server resource | `string` | `"northeurope"` | no |
-| <a name="input_sql_database_edition"></a> [sql\_database\_edition](#input\_sql\_database\_edition) | The edition of the database to be created; DEPRECATED - use 'databases' | `string` | `"Standard"` | no |
 | <a name="input_sqldb_init_script_file"></a> [sqldb\_init\_script\_file](#input\_sqldb\_init\_script\_file) | SQL Script file name to create and initialize the database | `string` | `""` | no |
-| <a name="input_sqldb_service_objective_name"></a> [sqldb\_service\_objective\_name](#input\_sqldb\_service\_objective\_name) | The service objective name for the database; DEPRECATED - use 'databases' | `string` | `"S1"` | no |
 | <a name="input_sqlserver_name"></a> [sqlserver\_name](#input\_sqlserver\_name) | SQL server Name | `string` | `""` | no |
 | <a name="input_storage_account_id"></a> [storage\_account\_id](#input\_storage\_account\_id) | The name of the storage account to store the all monitoring logs | `any` | `null` | no |
 | <a name="input_storage_account_name"></a> [storage\_account\_name](#input\_storage\_account\_name) | The name of the storage account name | `any` | `null` | no |

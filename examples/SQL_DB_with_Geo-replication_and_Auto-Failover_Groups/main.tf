@@ -22,10 +22,9 @@ module "mssql-server" {
 
   # SQL Server and Database details
   # The valid service objective name for the database include S0, S1, S2, S3, P1, P2, P4, P6, P11 
-  sqlserver_name               = "sqldbserver01"
-  database_name                = "demomssqldb"
-  sql_database_edition         = "Standard"
-  sqldb_service_objective_name = "S1"
+  sqlserver_name    = "sqldbserver01"
+  database_name     = "demomssqldb"
+  database_sku_name = "Basic"
 
   # SQL server extended auditing policy defaults to `true`. 
   # To turn off set enable_sql_server_extended_auditing_policy to `false`  

@@ -5,8 +5,7 @@ locals {
   #if_extended_auditing_policy_enabled = var.enable_extended_auditing_policy ? [{}] : []
   databases = length(var.databases) != 0 ? var.databases : [{
     name                   = var.database_name
-    edition                = var.sql_database_edition
-    service_objective_name = var.sqldb_service_objective_name
+    sku_name               = var.database_sku_name
     sqldb_init_script_file = var.sqldb_init_script_file
   }]
 }
@@ -138,7 +137,7 @@ resource "azurerm_mssql_server_extended_auditing_policy" "secondary" {
 
 
 #--------------------------------------------------------------------
-# SQL Database creation - Default edition:"Standard" and objective:"S1"
+# SQL Database creation - Default sku_name: "S0"
 #--------------------------------------------------------------------
 
 resource "azurerm_mssql_database" "db" {
@@ -147,11 +146,10 @@ resource "azurerm_mssql_database" "db" {
     db.name => db
   }
 
-  name                             = each.value.name
-  server_id                        = azurerm_mssql_server.primary.id
-  sku_name                         = each.value.edition
-  requested_service_objective_name = each.value.service_objective_name
-  tags                             = merge({ "Name" = format("%s-primary", each.value.name) }, var.tags, )
+  name      = each.value.name
+  server_id = azurerm_mssql_server.primary.id
+  sku_name  = each.value.sku_name
+  tags      = merge({ "Name" = format("%s-primary", each.value.name) }, var.tags, )
 
   dynamic "threat_detection_policy" {
     for_each = local.if_threat_detection_policy_enabled
