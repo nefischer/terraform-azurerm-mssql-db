@@ -149,7 +149,7 @@ resource "azurerm_mssql_database" "db" {
 
   name                             = each.value.name
   server_id                        = azurerm_mssql_server.primary.id
-  edition                          = each.value.edition
+  sku_name                         = each.value.edition
   requested_service_objective_name = each.value.service_objective_name
   tags                             = merge({ "Name" = format("%s-primary", each.value.name) }, var.tags, )
 
