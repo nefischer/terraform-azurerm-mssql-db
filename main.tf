@@ -148,10 +148,8 @@ resource "azurerm_mssql_database" "db" {
   }
 
   name                             = each.value.name
-  resource_group_name              = local.resource_group_name
-  location                         = local.location
-  server_name                      = azurerm_mssql_server.primary.name
-  edition                          = each.value.edition
+  server_id                        = azurerm_mssql_server.primary.id
+  sku_name                         = each.value.edition
   requested_service_objective_name = each.value.service_objective_name
   tags                             = merge({ "Name" = format("%s-primary", each.value.name) }, var.tags, )
 
