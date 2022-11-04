@@ -149,7 +149,7 @@ resource "azurerm_mssql_database" "db" {
   name      = each.value.name
   server_id = azurerm_mssql_server.primary.id
   sku_name  = each.value.sku_name
-  tags      = merge({ "Name" = format("%s-primary", each.value.name) }, var.tags, )
+  tags      = merge({ "Name" = each.value.name }, var.tags, )
 
   dynamic "threat_detection_policy" {
     for_each = local.if_threat_detection_policy_enabled
