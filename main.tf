@@ -148,10 +148,10 @@ resource "azurerm_mssql_database" "db" {
 
   name               = each.value.name
   server_id          = azurerm_mssql_server.primary.id
-  sku_name           = each.value.sku_name
-  license_type       = each.value.license_type ? each.value.license_type : "LicenseIncluded"
-  read_replica_count = each.value.read_replica_count ? each.value.read_replica_count : 0
-  read_scale         = each.value.read_scale ? each.value.read_scale : false
+  sku_name           = each.value.sku_name != null ? each.value.sku_name : "Standard"
+  license_type       = each.value.license_type != null ? each.value.license_type : "LicenseIncluded"
+  read_replica_count = each.value.read_replica_count != null ? each.value.read_replica_count : 0
+  read_scale         = each.value.read_scale != null ? each.value.read_scale : false
   tags               = merge({ "Name" = each.value.name }, var.tags, )
 
   dynamic "threat_detection_policy" {
@@ -243,7 +243,7 @@ resource "azurerm_mssql_server_vulnerability_assessment" "va_secondary" {
 resource "null_resource" "create_sql" {
   for_each = {
     for index, db in local.databases :
-    db.name => db if var.initialize_sql_script_execution && length(db.sqldb_init_script_file) != 0
+    db.name => db if var.initialize_sql_script_execution && db.sqldb_init_script_file != null && length(db.sqldb_init_script_file) != 0
   }
 
   provisioner "local-exec" {
