@@ -216,3 +216,9 @@ variable "public_network_access_enabled" {
   type        = bool
   default     = true
 }
+
+variable "password_rotation_months" {
+  description = "The number of months after which the password should be rotated; null means no rotation"
+  type        = number
+  default     = null
+}

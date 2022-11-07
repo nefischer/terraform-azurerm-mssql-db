@@ -74,8 +74,14 @@ resource "random_password" "main" {
   special     = false
 
   keepers = {
-    administrator_login_password = var.sqlserver_name
+    administrator_login_password = var.sqlserver_name,
+    password_rotation            = time_rotating.admin_password.id,
   }
+}
+
+resource "time_rotating" "admin_password" {
+  rotation_years  = var.password_rotation_months == null ? 1000 : 0 # if password_rotation_months is not set, effectively never rotate
+  rotation_months = var.password_rotation_months != null ? var.password_rotation_months : 0
 }
 
 resource "azurerm_mssql_server" "primary" {
