@@ -244,8 +244,6 @@ An effective naming convention assembles resource names by using important resou
 
 ## Requirements
 
-## Requirements
-
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
@@ -260,6 +258,7 @@ An effective naming convention assembles resource names by using important resou
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 2.59.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | >= 3.1.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | >= 3.1.0 |
+| <a name="provider_time"></a> [time](#provider\_time) | n/a |
 
 ## Modules
 
@@ -298,6 +297,7 @@ No modules.
 | [null_resource.create_sql](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_password.main](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
 | [random_string.str](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
+| [time_rotating.admin_password](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) | resource |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 | [azurerm_private_endpoint_connection.private-ip1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_endpoint_connection) | data source |
 | [azurerm_private_endpoint_connection.private-ip2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_endpoint_connection) | data source |
@@ -315,7 +315,7 @@ No modules.
 | <a name="input_create_resource_group"></a> [create\_resource\_group](#input\_create\_resource\_group) | Whether to create resource group and use it for all networking resources | `bool` | `true` | no |
 | <a name="input_database_name"></a> [database\_name](#input\_database\_name) | The name of the database; DEPRECATED - use 'databases' | `string` | `""` | no |
 | <a name="input_database_sku_name"></a> [database\_sku\_name](#input\_database\_sku\_name) | The SKU name of the database to be created; DEPRECATED - use 'databases' | `string` | `"Basic"` | no |
-| <a name="input_databases"></a> [databases](#input\_databases) | The list of databases to create | <pre>list(object({<br>    name                   = string<br>    sku_name               = string<br>    sqldb_init_script_file = string<br>  }))</pre> | `[]` | no |
+| <a name="input_databases"></a> [databases](#input\_databases) | The list of databases to create | <pre>list(object({<br>    name                   = string<br>    sku_name               = optional(string) # defaults to "Standard"<br>    sqldb_init_script_file = optional(string) # defaults to null (no script)<br>    license_type           = optional(string) # defaults to "LicenseIncluded"<br>    read_replica_count     = optional(number) # defaults to 0<br>    read_scale             = optional(bool)   # defaults to false<br>  }))</pre> | `[]` | no |
 | <a name="input_disabled_alerts"></a> [disabled\_alerts](#input\_disabled\_alerts) | Specifies an array of alerts that are disabled. Allowed values are: Sql\_Injection, Sql\_Injection\_Vulnerability, Access\_Anomaly, Data\_Exfiltration, Unsafe\_Action. | `list(any)` | `[]` | no |
 | <a name="input_email_addresses_for_alerts"></a> [email\_addresses\_for\_alerts](#input\_email\_addresses\_for\_alerts) | A list of email addresses which alerts should be sent to. | `list(any)` | `[]` | no |
 | <a name="input_enable_database_extended_auditing_policy"></a> [enable\_database\_extended\_auditing\_policy](#input\_enable\_database\_extended\_auditing\_policy) | Manages Extended Audit policy for SQL database | `bool` | `false` | no |
@@ -336,6 +336,7 @@ No modules.
 | <a name="input_location"></a> [location](#input\_location) | The location/region to keep all your network resources. To get the list of all locations with table format from azure cli, run 'az account list-locations -o table' | `string` | `""` | no |
 | <a name="input_log_analytics_workspace_id"></a> [log\_analytics\_workspace\_id](#input\_log\_analytics\_workspace\_id) | Specifies the ID of a Log Analytics Workspace where Diagnostics Data to be sent | `any` | `null` | no |
 | <a name="input_log_retention_days"></a> [log\_retention\_days](#input\_log\_retention\_days) | Specifies the number of days to keep in the Threat Detection audit logs | `string` | `"30"` | no |
+| <a name="input_password_rotation_months"></a> [password\_rotation\_months](#input\_password\_rotation\_months) | The number of months after which the password should be rotated; null means no rotation | `number` | `null` | no |
 | <a name="input_private_subnet_address_prefix"></a> [private\_subnet\_address\_prefix](#input\_private\_subnet\_address\_prefix) | The name of the subnet for private endpoints | `any` | `null` | no |
 | <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled) | Whether or not the database should be accessible from the internet | `bool` | `true` | no |
 | <a name="input_random_password_length"></a> [random\_password\_length](#input\_random\_password\_length) | The desired length of random password created by this module | `number` | `32` | no |
@@ -353,6 +354,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_password_rotation_timestamp"></a> [password\_rotation\_timestamp](#output\_password\_rotation\_timestamp) | RFC3339 format of the date/time after which the password will be renewed when terraform apply is run |
 | <a name="output_primary_sql_server_fqdn"></a> [primary\_sql\_server\_fqdn](#output\_primary\_sql\_server\_fqdn) | The fully qualified domain name of the primary Azure SQL Server |
 | <a name="output_primary_sql_server_id"></a> [primary\_sql\_server\_id](#output\_primary\_sql\_server\_id) | The primary Microsoft SQL Server ID |
 | <a name="output_primary_sql_server_private_endpoint"></a> [primary\_sql\_server\_private\_endpoint](#output\_primary\_sql\_server\_private\_endpoint) | id of the Primary SQL server Private Endpoint |

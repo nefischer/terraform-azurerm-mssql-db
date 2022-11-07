@@ -68,11 +68,11 @@ variable "databases" {
   description = "The list of databases to create"
   type = list(object({
     name                   = string
-    sku_name               = optional(string)
-    sqldb_init_script_file = optional(string)
-    license_type           = optional(string)
-    read_replica_count     = optional(number)
-    read_scale             = optional(bool)
+    sku_name               = optional(string) # defaults to "Standard"
+    sqldb_init_script_file = optional(string) # defaults to null (no script)
+    license_type           = optional(string) # defaults to "LicenseIncluded"
+    read_replica_count     = optional(number) # defaults to 0
+    read_scale             = optional(bool)   # defaults to false
   }))
   default = []
 }

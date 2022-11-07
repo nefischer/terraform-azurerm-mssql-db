@@ -80,7 +80,7 @@ resource "random_password" "main" {
 }
 
 resource "time_rotating" "admin_password" {
-  rotation_months = var.password_rotation_months != null ? var.password_rotation_months : 1000*12 # if password_rotation_months is not set, effectively never rotate
+  rotation_months = var.password_rotation_months != null ? var.password_rotation_months : 1000 * 12 # if password_rotation_months is not set, effectively never rotate
 }
 
 resource "azurerm_mssql_server" "primary" {
