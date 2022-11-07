@@ -146,10 +146,13 @@ resource "azurerm_mssql_database" "db" {
     db.name => db
   }
 
-  name      = each.value.name
-  server_id = azurerm_mssql_server.primary.id
-  sku_name  = each.value.sku_name
-  tags      = merge({ "Name" = each.value.name }, var.tags, )
+  name               = each.value.name
+  server_id          = azurerm_mssql_server.primary.id
+  sku_name           = each.value.sku_name
+  license_type       = each.value.license_type ? each.value.license_type : "LicenseIncluded"
+  read_replica_count = each.value.read_replica_count ? each.value.read_replica_count : 0
+  read_scale         = each.value.read_scale ? each.value.read_scale : false
+  tags               = merge({ "Name" = each.value.name }, var.tags, )
 
   dynamic "threat_detection_policy" {
     for_each = local.if_threat_detection_policy_enabled

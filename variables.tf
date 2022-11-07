@@ -70,6 +70,9 @@ variable "databases" {
     name                   = string
     sku_name               = string
     sqldb_init_script_file = string
+    license_type           = string
+    read_replica_count     = number
+    read_scale             = bool
   }))
   default = []
 }
