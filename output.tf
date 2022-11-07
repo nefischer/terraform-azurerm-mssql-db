@@ -113,3 +113,8 @@ output "secondary_sql_server_private_endpoint_fqdn" {
   description = "Secondary SQL server private endpoint IPv4 Addresses "
   value       = element(concat(azurerm_private_dns_a_record.arecord2.*.fqdn, [""]), 0)
 }
+
+output "password_rotation_timestamp" {
+  description = "RFC3339 format of the date/time after which the password will be renewed when terraform apply is run"
+  value       = time_rotating.admin_password.id
+}
