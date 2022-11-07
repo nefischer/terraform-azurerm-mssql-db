@@ -243,7 +243,7 @@ resource "azurerm_mssql_server_vulnerability_assessment" "va_secondary" {
 resource "null_resource" "create_sql" {
   for_each = {
     for index, db in local.databases :
-    db.name => db if var.initialize_sql_script_execution && db.sqldb_init_script_file != null && length(db.sqldb_init_script_file) != 0
+    db.name => db if db.sqldb_init_script_file == null ? false : var.initialize_sql_script_execution && length(db.sqldb_init_script_file) != 0
   }
 
   provisioner "local-exec" {
